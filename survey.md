@@ -1,9 +1,9 @@
 ___
 
 ### Audio Evaluation
-The remainder of the survey will show you a series of short 6 to 10 second audio clips. Type the words in the order that you hear in the audio clip. Should some sections of the audio seem unintelligible, you may fill in the gaps with "?". 
+The remainder of the survey will show you 20 short 6-10 second audio clips. First you are asked type the words in the order that you hear in the audio clip. If some sections of the audio clip sound unintelligible, you may fill the gaps by typing "?". If you found difficulty in identifying or are unsure of a word in your answer, you may also surround the word with "?" like "?word?". A sample entry of this is shown below. 
 
-Afterwards, rate the quality of the audio clip from 1 (lowest) to 5 (highest). The score should reflect your listening experience. Refer to the list below for your rating criteria.
+Afterwards, rate the quality of the audio clip from 1 (lowest) to 5 (highest). The score should reflect your listening experience. Refer to the list below for your rating criteria. You may repeat the audio clips as many times as you would like
 
 <ul>
   <li>1 - Words can not be understood with any feasible effort</li>
