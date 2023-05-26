@@ -1,7 +1,10 @@
 import streamlit as st
 from pathlib import Path
-import random
-import gspread
+import random, datetime
+
+# import gspread
+from pandas import DataFrame
+from gspread_pandas import Spread,Client
 from google.oauth2 import service_account
 
 def read_markdown_file(markdown_file):
@@ -14,94 +17,166 @@ def get_test_preset():
 def disable():
     st.session_state.disabled = True
 
+# Spreadsheet Functions 
+@st.cache_data()
+# Get our worksheet names
+def worksheet_names():
+    sheet_names = []   
+    for sheet in worksheet_list:
+        sheet_names.append(sheet.title)  
+    return sheet_names
+
+# Get the sheet as dataframe
+def load_the_spreadsheet(spreadsheetname):
+    worksheet = sh.worksheet(spreadsheetname)
+    df = DataFrame(worksheet.get_all_records())
+    return df
+
+# Update to Sheet
+def update_the_spreadsheet(spreadsheetname,dataframe):
+    col = ['preset','timestamp', 'name', 'email',  'age', 'gender', 'first_lang', 'second_lang', 'audt', 'words', 'ratings']
+    spread.df_to_sheet(dataframe[col],sheet = spreadsheetname,index = False)
+
+def record_response(preset, name, email, age, gender, lang1, lang2, audt, words, ratings):
+    ct = datetime.datetime.now()
+    ts = ct.timestamp()
+    df = load_the_spreadsheet('responses')
+    
+    opt = {'preset': preset,
+            'timestamp': ts,
+            'name': name,
+            'email': email,
+            'age': age,
+            'gender': gender,
+            'first_lang': lang1,
+            'second_lang': lang2,
+            'audt': audt,
+            'words': words,
+            'ratings': ratings} 
+    
+    opt_df = DataFrame(opt, index=[0])
+    new_df = df.append(opt_df,ignore_index=True)
+    update_the_spreadsheet('responses',new_df)
+
+
+
+# Disable certificate verification (Not necessary always)
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
+# Create a Google Authentication connection object
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+
+credentials = service_account.Credentials.from_service_account_info(
+                st.secrets["gcp_service_account"], scopes = scope)
+client = Client(scope=scope,creds=credentials)
+spreadsheetname = "asr-res"
+spread = Spread(spreadsheetname,client = client)
+
+sh = client.open(spreadsheetname)
+worksheet_list = sh.worksheets()
+
 st.set_page_config(page_title="ASR Survey", page_icon=":loudspeaker:")
 st.title("Audio Super Resolution Survey")
+
+# print(what_sheets)
 
 intro_markdown = read_markdown_file("intro.md")
 st.markdown(intro_markdown, unsafe_allow_html=True)
 
-consent = st.checkbox("I understand and consent to being a participant in the study")
+consent = st.checkbox("I understand and consent to being a participant in the study (Proceed with the survey)")
+st.markdown('___')
 
+### Personal Information
 if consent:
-    md = read_markdown_file("audt.md")
-    st.markdown(md, unsafe_allow_html=True)
+    with st.form("asr-form"):
+        st.markdown('### Personal Information')
+        name = st.text_input('Full Name', placeholder="Name")
+        email = st.text_input('Email', placeholder='example@gmail.com')
+        age = st.number_input('Age', value=18, step=1)
+        gender = st.selectbox(
+            'Gender',
+            ('Male', 'Female', 'Other'))
 
-    at_yes = "I DO NOT show signs of hearing loss "
-    at_no = "I DO show some signs of hearing loss "
+        st.markdown('If you are exposed to multiple languages at a young age, list your First language as the one you feel more proficient in.')
 
-    at_result = st.radio(
-        "Test result: ",
-        (at_yes, at_no))
+        lang1 = st.selectbox(
+            'First language',
+            ('English', 'Tagalog', 'Other'))
 
-    ### Personal Information
-    st.markdown('### Personal Information')
+        lang2 = st.selectbox(
+            'Second language',
+            ('Tagalog', 'English', 'Other'))
+        
+        md = read_markdown_file("audt.md")
+        st.markdown(md, unsafe_allow_html=True)
 
-    name = st.text_input('Name', placeholder="Name")
-    email = st.text_input('Email', placeholder='example@gmail.com')
-    age = st.number_input('Age', value=18, step=1)
-    gender = st.selectbox(
-        'Gender',
-        ('Male', 'Female', 'Other'))
+        at_yes = "I DO NOT show signs of hearing loss "
+        at_no = "I DO show some signs of hearing loss "
 
-    st.markdown('If you are exposed to multiple languages at a young age, list your First language as the one you feel more proficient in.')
+        audt = st.radio(
+            "Test result: ",
+            (at_yes, at_no))
 
-    lang1 = st.selectbox(
-        'First language',
-        ('English', 'Tagalog', 'Other'))
+        survey_markdown = read_markdown_file("survey.md")
+        st.markdown(survey_markdown, unsafe_allow_html=True)
 
-    lang2 = st.selectbox(
-        'Second language',
-        ('Tagalog', 'English', 'Other'))
+        audio_file = open('audio/input.wav', 'rb')
+        audio_bytes = audio_file.read()
 
-    survey_markdown = read_markdown_file("survey.md")
-    st.markdown(survey_markdown, unsafe_allow_html=True)
+        st.audio(audio_bytes, format='audio/wav')
 
-    audio_file = open('audio/input.wav', 'rb')
-    audio_bytes = audio_file.read()
-
-    st.audio(audio_bytes, format='audio/wav')
-
-    st.text_input('Enter the words spoken in the audio clip:', 'Text here', disabled=True)
-    st.slider('Rate the audio quality from 1 to 5 (highest) :', 1, 5, 3)
-    st.markdown('___')
-
-    ### Audio Eval Test
-
-    # preset selection
-    audio_bytes = []
-    base_path = Path("audio/base/preset1")
-    for wav_file_path in base_path.glob("*.wav"):
-        audio_file = open(wav_file_path, 'rb')
-        audio_bytes.append(audio_file.read())
-
-    base_path = Path("audio/quant/preset1")
-    for wav_file_path in base_path.glob("*.wav"):
-        audio_file = open(wav_file_path, 'rb')
-        audio_bytes.append(audio_file.read())
-
-    random.Random(1).shuffle(audio_bytes)
-    # random.shuffle(audio_bytes)
-
-    for i in range(20):
-        # TODO: variables to record participant answers
-        st.markdown('#### ' + str(i+1) + '.')
-        st.audio(audio_bytes[i], format='audio/wav')
-        st.text_input(str(i) + '. Enter the words spoken in the audio clip:', placeholder="...")
-        st.slider(str(i) + '. Rate the audio quality from 1 to 5 :', 1, 5, 3)
+        st.text_input('Enter the words spoken in the audio clip:', 'Text here', disabled=True)
+        st.slider('Rate the audio quality from 1 to 5 (highest) :', 1, 5, 3, disabled=True)
         st.markdown('___')
 
-    # st.markdown('#### 1.')
-    # st.audio(audio_bytes, format='audio/wav')
-    # ae_t1 = st.text_input('1. Enter the words spoken in the audio clip:', '')
-    # ae_r1 = st.slider('1. Rate the audio quality from 1 to 5 (highest) :', 1, 5, 3)
-    # st.markdown('___')
+        ### Audio Eval Test
 
-    st.markdown('By clicking the submit button, you agree to having your data collected for analysis')
+        # preset selection
+        #TODO: sparsification presets
+        audio_bytes = []
+        base_path = Path("audio/base/preset1")
+        for wav_file_path in base_path.glob("*.wav"):
+            audio_file = open(wav_file_path, 'rb')
+            audio_bytes.append(audio_file.read())
 
-    if "disabled" not in st.session_state:
-        st.session_state.disabled = False
+        base_path = Path("audio/quant/preset1")
+        for wav_file_path in base_path.glob("*.wav"):
+            audio_file = open(wav_file_path, 'rb')
+            audio_bytes.append(audio_file.read())
 
-    submit_button = st.button("Submit", on_click=disable, disabled=st.session_state.disabled)
+        random.Random(1).shuffle(audio_bytes)
+        # random.shuffle(audio_bytes)
 
-    if submit_button:
-        st.info('Your response has been submitted. Thank you for participating.')
+        words = []
+        ratings = []
+        for i in range(20):
+            # TODO: variables to record participant answers
+            st.markdown('#### ' + str(i+1) + '.')
+            st.audio(audio_bytes[i], format='audio/wav')
+            words.append(st.text_input(str(i) + '. Enter the words spoken in the audio clip:', placeholder="..."))
+            ratings.append(st.slider(str(i) + '. Rate the audio quality from 1 to 5 :', 1, 5, 3))
+            st.markdown('___')
+
+        # st.markdown('#### 1.')
+        # st.audio(audio_bytes, format='audio/wav')
+        # ae_t1 = st.text_input('1. Enter the words spoken in the audio clip:', '')
+        # ae_r1 = st.slider('1. Rate the audio quality from 1 to 5 (highest) :', 1, 5, 3)
+        # st.markdown('___')
+
+        st.markdown('By clicking the submit button, you agree to having your data collected for analysis. Please wait for cofirmation that your response has been submitted before exiting.')
+
+        if "disabled" not in st.session_state:
+            st.session_state.disabled = False
+
+        submit_button = st.form_submit_button("Submit", on_click=disable, disabled=st.session_state.disabled)
+
+        if submit_button:
+            # Check the connection
+            # st.write(spread.url)
+            # print(words)
+            words = ','.join(words)
+            ratings = ','.join(map(str, ratings))
+            record_response(111, name, email, age, gender, lang1, lang2, audt, words, ratings)
+            st.info('Your response has been submitted. Thank you for participating.')
