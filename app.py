@@ -11,7 +11,7 @@ def read_markdown_file(markdown_file):
     return Path(markdown_file).read_text()
 
 def get_test_preset(preset):
-    # TODO: logic for selecting random test preset
+    # TODO: change path depending on preset, first preset is already correct
     p = {
         '1b2q': ['audio/base/1','audio/quant/2'], 
         '1q2s': ['audio/base/1','audio/quant/2'], 
@@ -91,7 +91,13 @@ worksheet_list = sh.worksheets()
 st.set_page_config(page_title="ASR Survey", page_icon=":loudspeaker:")
 st.title("Audio Super Resolution Survey")
 
-print(get_test_preset(0))
+# define preset list
+preset_list = ['1b2q', '1q2s', '1s2b', '3b4q', '3q4s', '3s4b', '5b6q', '5q6s', '5s6b']
+
+# preset selection
+preset = random.choice(preset_list)
+# TODO: let user choose a preset
+st.write('Survey code: ' + preset)
 
 intro_markdown = read_markdown_file("intro.md")
 st.markdown(intro_markdown, unsafe_allow_html=True)
@@ -130,9 +136,13 @@ if consent:
             "Test result: ",
             (at_yes, at_no))
 
+        st.markdown('___')
+        st.write('Survey code: ' + preset)
+
         survey_markdown = read_markdown_file("survey.md")
         st.markdown(survey_markdown, unsafe_allow_html=True)
 
+        # TODO: change sample audio clip
         audio_file = open('audio/input.wav', 'rb')
         audio_bytes = audio_file.read()
 
@@ -144,13 +154,6 @@ if consent:
 
         ### Audio Eval Test
 
-        # define preset list
-        preset_list = ['1b2q', '1q2s', '1s2b', '3b4q', '3q4s', '3s4b', '5b6q', '5q6s', '5s6b']
-
-        # preset selection
-        preset = random.choice(preset_list)
-
-        #TODO: sparsification presets
         audio_bytes = []
         base_path = Path(get_test_preset(preset)[0])
         for wav_file_path in base_path.glob("*.wav"):
@@ -161,8 +164,6 @@ if consent:
         for wav_file_path in base_path.glob("*.wav"):
             audio_file = open(wav_file_path, 'rb')
             audio_bytes.append(audio_file.read())
-
-        print(preset, get_test_preset(preset)[0], get_test_preset(preset)[1])
 
         random.Random(1).shuffle(audio_bytes)
         # random.shuffle(audio_bytes)
@@ -197,4 +198,4 @@ if consent:
             words = ','.join(words)
             ratings = ','.join(map(str, ratings))
             record_response(111, name, email, age, gender, lang1, lang2, audt, words, ratings)
-            st.info('Your response has been submitted. Thank you for participating.')
+            st.info('Your response has been submitted. Thank you for participating. If you wish to contribute an additional response, refresh the page.')
