@@ -10,9 +10,20 @@ from google.oauth2 import service_account
 def read_markdown_file(markdown_file):
     return Path(markdown_file).read_text()
 
-def get_test_preset():
+def get_test_preset(preset):
     # TODO: logic for selecting random test preset
-    pass
+    p = {
+        '1b2q': ['audio/base/1','audio/quant/2'], 
+        '1q2s': ['audio/base/1','audio/quant/2'], 
+        '1s2b': ['audio/base/1','audio/quant/2'], 
+        '3b4q': ['audio/base/1','audio/quant/2'], 
+        '3q4s': ['audio/base/1','audio/quant/2'], 
+        '3s4b': ['audio/base/1','audio/quant/2'], 
+        '5b6q': ['audio/base/1','audio/quant/2'], 
+        '5q6s': ['audio/base/1','audio/quant/2'], 
+        '5s6b': ['audio/base/1','audio/quant/2']
+    }
+    return p.get(preset, ['audio/base/1','audio/quant/2'])
 
 def disable():
     st.session_state.disabled = True
@@ -80,7 +91,7 @@ worksheet_list = sh.worksheets()
 st.set_page_config(page_title="ASR Survey", page_icon=":loudspeaker:")
 st.title("Audio Super Resolution Survey")
 
-# print(what_sheets)
+print(get_test_preset(0))
 
 intro_markdown = read_markdown_file("intro.md")
 st.markdown(intro_markdown, unsafe_allow_html=True)
@@ -133,18 +144,25 @@ if consent:
 
         ### Audio Eval Test
 
+        # define preset list
+        preset_list = ['1b2q', '1q2s', '1s2b', '3b4q', '3q4s', '3s4b', '5b6q', '5q6s', '5s6b']
+
         # preset selection
+        preset = random.choice(preset_list)
+
         #TODO: sparsification presets
         audio_bytes = []
-        base_path = Path("audio/base/preset1")
+        base_path = Path(get_test_preset(preset)[0])
         for wav_file_path in base_path.glob("*.wav"):
             audio_file = open(wav_file_path, 'rb')
             audio_bytes.append(audio_file.read())
 
-        base_path = Path("audio/quant/preset1")
+        base_path = Path(get_test_preset(preset)[1])
         for wav_file_path in base_path.glob("*.wav"):
             audio_file = open(wav_file_path, 'rb')
             audio_bytes.append(audio_file.read())
+
+        print(preset, get_test_preset(preset)[0], get_test_preset(preset)[1])
 
         random.Random(1).shuffle(audio_bytes)
         # random.shuffle(audio_bytes)
@@ -152,7 +170,6 @@ if consent:
         words = []
         ratings = []
         for i in range(20):
-            # TODO: variables to record participant answers
             st.markdown('#### ' + str(i+1) + '.')
             st.audio(audio_bytes[i], format='audio/wav')
             words.append(st.text_input(str(i) + '. Enter the words spoken in the audio clip:', placeholder="..."))
@@ -172,6 +189,7 @@ if consent:
 
         submit_button = st.form_submit_button("Submit", on_click=disable, disabled=st.session_state.disabled)
 
+        #TODO: disable until everything is filled
         if submit_button:
             # Check the connection
             # st.write(spread.url)
