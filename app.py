@@ -193,5 +193,5 @@ if consent:
             # print(words)
             words = ','.join(words)
             ratings = ','.join(map(str, ratings))
-            record_response(111, name, email, age, gender, lang1, lang2, audt, words, ratings)
+            record_response(preset, name, email, age, gender, lang1, lang2, audt, words, ratings)
             st.info('Your response has been submitted. Thank you for participating. If you wish to contribute an additional response, refresh the page.')
