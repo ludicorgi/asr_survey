@@ -18,10 +18,7 @@ def get_test_preset(preset):
         '1s2b': ['audio/base/1','audio/quant/2'], 
         '3b4q': ['audio/base/1','audio/quant/2'], 
         '3q4s': ['audio/base/1','audio/quant/2'], 
-        '3s4b': ['audio/base/1','audio/quant/2'], 
-        '5b6q': ['audio/base/1','audio/quant/2'], 
-        '5q6s': ['audio/base/1','audio/quant/2'], 
-        '5s6b': ['audio/base/1','audio/quant/2']
+        '3s4b': ['audio/base/1','audio/quant/2']
     }
     return p.get(preset, ['audio/base/1','audio/quant/2'])
 
@@ -92,7 +89,7 @@ st.set_page_config(page_title="ASR Survey", page_icon=":loudspeaker:")
 st.title("Audio Super Resolution Survey")
 
 # define preset list
-preset_list = ['1b2q', '1q2s', '1s2b', '3b4q', '3q4s', '3s4b', '5b6q', '5q6s', '5s6b']
+preset_list = ['1b2q', '1q2s', '1s2b', '3b4q', '3q4s', '3s4b']
 
 # preset selection
 preset = random.choice(preset_list)
