@@ -46,8 +46,7 @@ def update_the_spreadsheet(spreadsheetname,dataframe):
     spread.df_to_sheet(dataframe[col],sheet = spreadsheetname,index = False)
 
 def record_response(preset, name, email, age, gender, lang1, lang2, audt, words, ratings):
-    ct = datetime.datetime.now()
-    ts = ct.timestamp()
+    ts = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
     df = load_the_spreadsheet('responses')
     
     opt = {'preset': preset,
