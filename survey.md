@@ -1,7 +1,7 @@
 ### Audio Evaluation
 Take note of the survey code above if you plan on contributing multiple responses. There are a total of 6 unique survey codes.
 
-The remainder of the survey will show you 20 short 4-12 second audio clips, some may be of lower quality. First you are asked type the words in the order that you hear in the audio clip. If some sections of the audio clip sound unintelligible, you may fill the gaps by typing "?" in place of a word. If you found difficulty in identifying or are unsure of a word in your answer, you may also surround the word with "?" like "?example?". A sample entry of this is shown below. 
+The remainder of the survey will show you 20 short 3-6 second audio clips, some may be of lower quality. First you are asked type the words in the order that you hear in the audio clip. If some sections of the audio clip sound unintelligible, you may fill the gaps by typing "?" in place of a word. If you found difficulty in identifying or are unsure of a word in your answer, you may also surround the word/s with "?" like "?example answer?". A sample entry of this is shown below. 
 
 Afterwards, rate the quality of the audio clip from 1 (lowest) to 5 (highest). The score should reflect your listening experience. Refer to the list below for your rating criteria. You may repeat the audio clips as many times as you would like. **Please listen to the audio clips at a comfortable volume while wearing headphones/earphones**
 
@@ -14,5 +14,5 @@ Afterwards, rate the quality of the audio clip from 1 (lowest) to 5 (highest). T
 </ul> 
 
 #### Sample Entry
-Here is an example entry for an audio clip containing the words: "...", with some words being unintelligible.
+Here is an example entry for an audio clip containing the words: "The Greeks used to imagine that it was a sign from the Gods to foretell war or heavy rain", with some words being unintelligible to the participant.
 

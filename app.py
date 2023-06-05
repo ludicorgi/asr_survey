@@ -13,12 +13,12 @@ def read_markdown_file(markdown_file):
 def get_test_preset(preset):
     # TODO: change path depending on preset, first preset is already correct
     p = {
-        '1b2q': ['audio/base/1','audio/quant/2'], 
-        '1q2s': ['audio/base/1','audio/quant/2'], 
-        '1s2b': ['audio/base/1','audio/quant/2'], 
-        '3b4q': ['audio/base/1','audio/quant/2'], 
-        '3q4s': ['audio/base/1','audio/quant/2'], 
-        '3s4b': ['audio/base/1','audio/quant/2']
+        'A': ['audio/base/1','audio/quant/2'], # 1b2q
+        'B': ['audio/quant/1','audio/spars/3'], # 1q3s
+        'C': ['audio/spars/1','audio/base/4'], # 1s4b
+        'D': ['audio/base/2','audio/quant/4'], # 2b4q
+        'E': ['audio/spars/2','audio/base/3'], # 2s3b
+        'F': ['audio/quant/3','audio/spars/4']  # 3q4s
     }
     return p.get(preset, ['audio/base/1','audio/quant/2'])
 
@@ -88,12 +88,12 @@ st.set_page_config(page_title="ASR Survey", page_icon=":loudspeaker:")
 st.title("Audio Super Resolution Survey")
 
 # define preset list
-preset_list = ['1b2q', '1q2s', '1s2b', '3b4q', '3q4s', '3s4b']
+preset_list = ['A', 'B', 'C', 'D', 'E', 'F']
 
 # preset selection
 preset = random.choice(preset_list)
 # TODO: let user choose a preset
-st.write('Survey code: ' + preset)
+st.write('Test Set: ' + preset)
 
 intro_markdown = read_markdown_file("intro.md")
 st.markdown(intro_markdown, unsafe_allow_html=True)
@@ -133,7 +133,7 @@ if consent:
             (at_yes, at_no))
 
         st.markdown('___')
-        st.write('Survey code: ' + preset)
+        st.write('Test set: ' + preset)
 
         survey_markdown = read_markdown_file("survey.md")
         st.markdown(survey_markdown, unsafe_allow_html=True)
@@ -144,13 +144,14 @@ if consent:
 
         st.audio(audio_bytes, format='audio/wav')
 
-        st.text_input('Enter the words spoken in the audio clip:', 'Text here', disabled=True)
+        st.text_input('Enter the words spoken in the audio clip:', 'The ? used to imagine that it was a ?sign? from the Gods to ? or heavy rain', disabled=True)
         st.slider('Rate the audio quality from 1 to 5 (highest) :', 1, 5, 3, disabled=True)
         st.markdown('___')
 
         ### Audio Eval Test
 
         audio_bytes = []
+        print(get_test_preset(preset)[0], get_test_preset(preset)[1])
         base_path = Path(get_test_preset(preset)[0])
         for wav_file_path in base_path.glob("*.wav"):
             audio_file = open(wav_file_path, 'rb')
@@ -194,4 +195,4 @@ if consent:
             words = ','.join(words)
             ratings = ','.join(map(str, ratings))
             record_response(preset, name, email, age, gender, lang1, lang2, audt, words, ratings)
-            st.info('Your response has been submitted. Thank you for participating. If you wish to contribute an additional response, refresh the page.')
+            st.info('Your response has been submitted. Thank you for participating. If you wish to contribute an additional response, refresh the page for a new test set.')
