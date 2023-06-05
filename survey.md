@@ -1,5 +1,5 @@
 ### Audio Evaluation
-Take note of the survey code above if you plan on contributing multiple responses. There are a total of 6 unique survey codes.
+Take note of the test set above if you plan on contributing multiple responses. There are a total of 6 test sets.
 
 The remainder of the survey will show you 20 short 3-6 second audio clips, some may be of lower quality. First you are asked type the words in the order that you hear in the audio clip. If some sections of the audio clip sound unintelligible, you may fill the gaps by typing "?" in place of a word. If you found difficulty in identifying or are unsure of a word in your answer, you may also surround the word/s with "?" like "?example answer?". A sample entry of this is shown below. 
 

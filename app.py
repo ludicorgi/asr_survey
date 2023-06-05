@@ -92,8 +92,6 @@ preset_list = ['A', 'B', 'C', 'D', 'E', 'F']
 
 # preset selection
 preset = random.choice(preset_list)
-# TODO: let user choose a preset
-st.write('Test Set: ' + preset)
 
 intro_markdown = read_markdown_file("intro.md")
 st.markdown(intro_markdown, unsafe_allow_html=True)
@@ -103,6 +101,17 @@ st.markdown('___')
 
 ### Personal Information
 if consent:
+
+    # let user choose a preset
+    option = st.selectbox(
+    'If you are contributing multiple responses to this survey, select a Test Set that you have not yet answered. Otherwise, leave it at Random',
+    ('Random', 'A', 'B', 'C', 'D', 'E', 'F'))
+
+    if(option != 'Random'):
+        preset = option 
+
+    st.write('Test Set: ' + preset)
+
     with st.form("asr-form"):
         st.markdown('### Personal Information')
         name = st.text_input('Full Name', placeholder="Name")
@@ -148,7 +157,7 @@ if consent:
         st.slider('Rate the audio quality from 1 to 5 (highest) :', 1, 5, 3, disabled=True)
         st.markdown('___')
 
-        ### Audio Eval Test
+        ### Audio Eval Test      
 
         audio_bytes = []
         print(get_test_preset(preset)[0], get_test_preset(preset)[1])
